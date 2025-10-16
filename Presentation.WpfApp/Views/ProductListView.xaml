@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="Presentation.WpfApp.Views.ProductListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Presentation.WpfApp.Views"
+             xmlns:viewmodels="clr-namespace:Presentation.WpfApp.ViewModels"
+             xmlns:productmodels="clr-namespace:Infrastructure.Models.Product;assembly=Infrastructure"
+             xmlns:categorymodels="clr-namespace:Infrastructure.Models.ProductCategory;assembly=Infrastructure"
+             xmlns:manufacturemodels="clr-namespace:Infrastructure.Models.ProductManufacture;assembly=Infrastructure"
+             d:DataContext="{d:DesignInstance Type=viewmodels:ProductListViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock Grid.Row="0" Text="Product list" FontSize="25" FontWeight="Bold" Foreground="AliceBlue" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </StackPanel>
+        <ListView Grid.Row="1" Margin="0 10 0 15" x:Name="Prodcuts" ItemsSource="{Binding Products}" HorizontalContentAlignment="Stretch">
+            <ListView.ItemTemplate>
+                <DataTemplate DataType="{x:Type productmodels:Product}">
+                    <Grid Margin="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Name}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding Description}" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="{Binding Category.Name}" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding Manufacture.Name}" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="{Binding Id}" FontSize="10" Foreground="Gray" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Price}" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button Grid.Row="2" Padding="8" Content="Go to main menu" Command="{Binding GoToMainMenuCommand}" />
+    </Grid>
+</UserControl>
