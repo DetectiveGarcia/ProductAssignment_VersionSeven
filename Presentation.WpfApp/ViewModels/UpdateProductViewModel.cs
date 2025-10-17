@@ -24,7 +24,7 @@ public partial class UpdateProductViewModel : ObservableObject
     private string _header = "Update a product";
 
     [ObservableProperty]
-    private string _productId;
+    private string _productId = null!;
 
     [ObservableProperty]
     private UpdateProductRequest _updateProductRequest = new()
