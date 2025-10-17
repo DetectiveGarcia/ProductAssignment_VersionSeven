@@ -39,7 +39,21 @@ public partial class AddProductViewModel : ObservableObject
     [RelayCommand]
     private async Task AddProduct()
     {
+
+        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+        
+
         var result = await _productManager.CreateProduct(ProductRequest.Name, ProductRequest.Price, ProductRequest.Category.Name, ProductRequest.Manufacture.Name, ProductRequest.Description);
+
+        var addProductVM = _serviceProvider.GetRequiredService<AddProductViewModel>();
+
+        var notificationVM = new NotificationViewModel(_serviceProvider, result.Message ?? result.Error, result.Success, addProductVM);
+
+
+        mainViewModel.CurrentViewModel = notificationVM;
+
+        if (!result.Success) return;
+
         ProductRequest = new CreateProductRequest
         {
             Category = new(),

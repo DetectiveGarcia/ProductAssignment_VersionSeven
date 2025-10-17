@@ -4,7 +4,7 @@ namespace Infrastructure.Interfaces;
 
 public interface IProductManager
 {
-    Task<string> CreateProduct(string name, string price, string category, string manufacture, string? description);
+    Task<ProductResult> CreateProduct(string name, string price, string category, string manufacture, string? description);
     Task<ProductObjectResult<IReadOnlyList<Product>>> GetProductList();
     Task<ProductObjectResult<Product>> GetProductById(string productId);
     Task<ProductObjectResult<Product>> GetProductByName(string productName);

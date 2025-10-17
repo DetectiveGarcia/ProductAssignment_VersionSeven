@@ -43,6 +43,8 @@ namespace Presentation.WpfApp
                 services.AddSingleton<IProductService, ProductService>();
                 services.AddSingleton<IProductManager, ProductManager>();
 
+                services.AddTransient<NotificationViewModel>();
+                services.AddTransient<NotificationView>();
             })
                 .Build();
         }

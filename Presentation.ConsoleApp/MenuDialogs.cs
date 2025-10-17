@@ -74,7 +74,13 @@ public class MenuDialogs(IProductManager productManager)
 
         var productResult = await _productManager.CreateProduct(name, price, category, manufacture, description);
 
-        Console.WriteLine(productResult);
+        if (!productResult.Success)
+        {
+            Console.WriteLine(productResult.Error);
+            return;
+        }
+
+        Console.WriteLine(productResult.Message);
     }
 
     private async Task FindProductByIdOption()

@@ -38,28 +38,60 @@ public partial class UpdateProductViewModel : ObservableObject
     {
         var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
         mainViewModel.CurrentViewModel = _serviceProvider.GetRequiredService<MainMenuViewModel>();
+        UpdateProductRequest = new()
+        {
+            Category = new UpdateCategoryRequest(),
+            Manufacture = new UpdateManufactureRequest()
+        };
+        ProductId = string.Empty;
     }
 
     [RelayCommand]
     private async Task GetProductByIdBtn()
     {
-        var product = await _productManager.GetProductById(ProductId);
+        var result = await _productManager.GetProductById(ProductId);
+
+        if (!result.Success)
+        {
+            var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+
+            var updateProductVM = _serviceProvider.GetRequiredService<UpdateProductViewModel>();
+
+            var notificationVM = new NotificationViewModel(_serviceProvider, result.Message ?? result.Error, result.Success, updateProductVM);
+
+            mainViewModel.CurrentViewModel = notificationVM;
+            return;
+        }
+
+  
 
         UpdateProductRequest = new UpdateProductRequest
         {
-            Name = product.Content.Name,
-            Description = product.Content.Description,
-            Price = product.Content.Price.ToString(),
-            Category = new UpdateCategoryRequest { Name = product.Content.Category.Name },
-            Manufacture = new UpdateManufactureRequest { Name = product.Content.Manufacture.Name }
+            Name = result.Content.Name,
+            Description = result.Content.Description,
+            Price = result.Content.Price.ToString(),
+            Category = new UpdateCategoryRequest { Name = result.Content.Category.Name },
+            Manufacture = new UpdateManufactureRequest { Name = result.Content.Manufacture.Name }
         };
+
+
 
     }
 
     [RelayCommand]
     private async Task UpdateProduct()
     {
-        await _productManager.UpdateProductAsync(ProductId, UpdateProductRequest.Name, UpdateProductRequest.Price, UpdateProductRequest.Category.Name, UpdateProductRequest.Manufacture.Name, UpdateProductRequest.Description);
+        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+
+        var result = await _productManager.UpdateProductAsync(ProductId, UpdateProductRequest.Name, UpdateProductRequest.Price, UpdateProductRequest.Category.Name, UpdateProductRequest.Manufacture.Name, UpdateProductRequest.Description);
+
+        var updateProductVM = _serviceProvider.GetRequiredService<UpdateProductViewModel>();
+
+        var notificationVM = new NotificationViewModel(_serviceProvider, result.Message ?? result.Error, result.Success, updateProductVM);
+
+        mainViewModel.CurrentViewModel = notificationVM;
+
+        if (!result.Success) return;
 
         UpdateProductRequest = new()
         {

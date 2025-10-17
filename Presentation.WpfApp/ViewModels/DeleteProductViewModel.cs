@@ -23,9 +23,18 @@ public partial class DeleteProductViewModel : ObservableObject
     private DeleteProductRequest _productId = new(); 
 
     [RelayCommand]
-    private void DeleteProduct()
+    private async Task DeleteProduct()
     {
-        var result = _productManager.DeleteProductAsync(ProductId.Id);
+        var result = await _productManager.DeleteProductAsync(ProductId.Id);
+
+        var mainViewModel = _serviceProvider.GetRequiredService<MainViewModel>();
+
+        var deleteProductVM = _serviceProvider.GetRequiredService<DeleteProductViewModel>();
+
+        var notificationVM = new NotificationViewModel(_serviceProvider, result.Message ?? result.Error, result.Success, deleteProductVM);
+
+        mainViewModel.CurrentViewModel = notificationVM;
+
         ProductId = new DeleteProductRequest();
     }
 

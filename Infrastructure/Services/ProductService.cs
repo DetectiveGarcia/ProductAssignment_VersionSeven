@@ -27,6 +27,48 @@ public class ProductService(IJsonFileRepository jsonFileRepository) : IProductSe
         if (newProduct == null) 
             return new ProductResult { Success = false, StatusCode = 400, Error = "Product was null" };
 
+        if (string.IsNullOrWhiteSpace(newProduct.Name))
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "You must enter a product name."
+            };
+
+        if(string.IsNullOrEmpty(newProduct.Price))
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "You must enter a price."
+            };
+
+        decimal parsedPrice = decimal.Parse(newProduct.Price);
+
+        if (parsedPrice <= 0)
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "Price must be over 0 money units"
+            };
+
+        if (string.IsNullOrWhiteSpace(newProduct.Category.Name))
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "You must enter a category name."
+            };
+
+        if (string.IsNullOrWhiteSpace(newProduct.Manufacture.Name))
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "You must enter a manufature name."
+            };
+
         try
         {
             Category category = new()
@@ -119,14 +161,29 @@ public class ProductService(IJsonFileRepository jsonFileRepository) : IProductSe
 
     public async Task<ProductObjectResult<Product>> GetProductByIdAsync(string id, CancellationToken cancellationToken = default)
     {
+
+        if (string.IsNullOrEmpty(id))
+            return new ProductObjectResult<Product>()
+            {
+                Content = null,
+                StatusCode = 400,
+                Error = "You must enter product ID.",
+                Success = false
+            };
+
         await EnsureLoadedAsync(cancellationToken);
+
+
+
         var product = _productList.FirstOrDefault(p => p.Id == id);
+
 
         if (product == null)
             return new ProductObjectResult<Product>
             {
+                Content = null,
                 Success = false,
-                Error = "Product not found",
+                Error = "Product not found.",
                 StatusCode = 404,
             };
 
@@ -166,18 +223,71 @@ public class ProductService(IJsonFileRepository jsonFileRepository) : IProductSe
     {
         await EnsureLoadedAsync();
 
+        if (string.IsNullOrEmpty(product.Id))
+            return new ProductResult()
+            {
+                StatusCode = 400,
+                Error = "You must enter product ID.",
+                Success = false
+            };
+
+
         var productToUpdate = _productList.FirstOrDefault(p => p.Id == product.Id);
-
-
 
 
 
         if (productToUpdate == null)
             return new ProductResult()
             {
-                Success = false,
                 StatusCode = 404,
-                Error = "Product not found"
+                Success = false,
+                Error = "Product not found."
+            };
+
+        if (product == null)
+            return new ProductResult { Success = false, StatusCode = 400, Error = "Product was null" };
+
+
+        if (string.IsNullOrWhiteSpace(product.Name))
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "You must enter a product name."
+            };
+
+        if (string.IsNullOrEmpty(product.Price))
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "You must enter a price."
+            };
+
+        decimal parsedPrice = decimal.Parse(product.Price);
+
+        if (parsedPrice <= 0)
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "Price must be over 0 money units"
+            };
+
+        if (string.IsNullOrWhiteSpace(product.Category.Name))
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "You must enter a category name."
+            };
+
+        if (string.IsNullOrWhiteSpace(product.Manufacture.Name))
+            return new ProductResult
+            {
+                Success = false,
+                StatusCode = 400,
+                Error = "You must enter a manufature name."
             };
 
 
@@ -214,7 +324,7 @@ public class ProductService(IJsonFileRepository jsonFileRepository) : IProductSe
             {
                 StatusCode = 404,
                 Success = false,
-                Error = "Product not found, can't delete product."
+                Error = "Product not found"
             };
 
         _productList.Remove(productForDeletion);

@@ -1,7 +1,9 @@
-﻿using Infrastructure.Interfaces;
+﻿using Infrastructure.Helpers;
+using Infrastructure.Interfaces;
 using Infrastructure.Models.Product;
 using Infrastructure.Models.ProductCategory;
 using Infrastructure.Models.ProductManufacture;
+using System.Runtime.InteropServices;
 
 namespace Infrastructure.Managers;
 
@@ -17,44 +19,41 @@ public class ProductManager(IProductService productService) : IProductManager
         _cts.Cancel();
     }
 
-    public async Task<string> CreateProduct(string name, string price, string category, string manufacture, string? description)
+    public async Task<ProductResult> CreateProduct(string name, string price, string category, string manufacture, string? description)
     {
         if (_loading)
         {
             Cancel();
         }
         _cts = new();
-        var parsedPrice = decimal.Parse(price);
-        if (parsedPrice <= 0)
-            return "Price must be over 0 money units";
 
         CreateCategoryRequest categoryRequest = new()
         {
-            Name = category
+            Name = Sanitize.Input(category)
         };
 
         CreateManufactureRequest manufactureRequest = new()
         {
-            Name = manufacture
+            Name = Sanitize.Input(manufacture)
         };
 
         CreateProductRequest newProduct = new()
         {
-            Name = name,
-            Price = price,
+            Name = Sanitize.Input(name),
+            Price = Sanitize.Input(price),
             Category = categoryRequest,
             Manufacture = manufactureRequest,
-            Description = description
+            Description = Sanitize.Input(description)
         };
 
         var productResult = await _productService.SaveProductAsync(newProduct, _cts.Token);
 
         if (!productResult.Success)
         {
-            return productResult.Error;
+            return productResult;
         }
 
-        return productResult.Message;
+        return productResult;
     }
 
     public async Task<ProductObjectResult<IReadOnlyList<Product>>> GetProductList()
@@ -151,20 +150,8 @@ public class ProductManager(IProductService productService) : IProductManager
 
         var productResult = await _productService.DeleteProductAsync(productForDeletion, _cts.Token);
 
-        if (!productResult.Success)
-            return new ProductResult()
-            {
-                StatusCode = productResult.StatusCode,
-                Error = productResult.Error,
-                Success = productResult.Success
-            };
 
-        return new ProductResult()
-        {
-            Success = productResult.Success,
-            Error = productResult.Error,
-            StatusCode = productResult.StatusCode
-        };
+        return productResult;
 
     }
 
